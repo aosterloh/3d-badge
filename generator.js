@@ -374,13 +374,16 @@ function createHexGridPaths() {
 }
 
 /**
- * Parametric 2D vector shapes for the top 5 Google Services
- * Scaled to fill ~12.5 mm inside the 15 mm circular disc
+ * Parametric 2D vector shapes for Google Services & 22 Iconic Pop Culture Silhouettes
+ * Scaled to fill ~11-12 mm inside the 15 mm circular disc (100% watertight & support-free)
  */
 function getDirectServiceShapes(serviceName) {
-  const name = serviceName.toLowerCase();
+  const name = (serviceName || 'cloud').toLowerCase().trim();
   const shapes = [];
 
+  // ==========================================
+  // 1. GOOGLE SERVICES & BRANDS
+  // ==========================================
   if (name.includes('cloud')) {
     // Google Cloud silhouette (scaled ~12.5 mm)
     const cloud = new THREE.Shape();
@@ -454,7 +457,7 @@ function getDirectServiceShapes(serviceName) {
     tri.closePath();
     tv.holes.push(tri);
     shapes.push(tv);
-  } else {
+  } else if (name.includes('deepmind') || name.includes('gemini')) {
     // Google DeepMind / Gemini 4-Point Sparkle Star (scaled ~12.5 mm)
     const star = new THREE.Shape();
     const rOuter = 5.8;
@@ -466,6 +469,536 @@ function getDirectServiceShapes(serviceName) {
     star.quadraticCurveTo(-rInner * 0.4, rInner * 0.4, 0, rOuter);
     star.closePath();
     shapes.push(star);
+
+  // ==========================================
+  // 2. STAR WARS & SCI-FI SILHOUETTES
+  // ==========================================
+  } else if (name.includes('vader')) {
+    // Darth Vader Helmet Silhouette
+    const helmet = new THREE.Shape();
+    helmet.absarc(0, 1.2, 4.4, Math.PI * 0.12, Math.PI * 0.88, false);
+    helmet.lineTo(-5.2, -2.8);
+    helmet.lineTo(-4.2, -4.5);
+    helmet.lineTo(-2.2, -3.2);
+    helmet.lineTo(0, -5.2); // chin point
+    helmet.lineTo(2.2, -3.2);
+    helmet.lineTo(4.2, -4.5);
+    helmet.lineTo(5.2, -2.8);
+    helmet.closePath();
+
+    // Breath mask triangular grille hole
+    const grill = new THREE.Path();
+    grill.moveTo(-1.2, -2.2);
+    grill.lineTo(1.2, -2.2);
+    grill.lineTo(0, -4.0);
+    grill.closePath();
+    helmet.holes.push(grill);
+
+    // Left eye visor slot
+    const eyeL = new THREE.Path();
+    eyeL.moveTo(-3.0, -0.4);
+    eyeL.lineTo(-1.2, -0.4);
+    eyeL.lineTo(-1.6, -1.5);
+    eyeL.lineTo(-2.8, -1.2);
+    eyeL.closePath();
+    helmet.holes.push(eyeL);
+
+    // Right eye visor slot
+    const eyeR = new THREE.Path();
+    eyeR.moveTo(1.2, -0.4);
+    eyeR.lineTo(3.0, -0.4);
+    eyeR.lineTo(2.8, -1.2);
+    eyeR.lineTo(1.6, -1.5);
+    eyeR.closePath();
+    helmet.holes.push(eyeR);
+    shapes.push(helmet);
+  } else if (name.includes('yoda')) {
+    // Master Yoda Ears & Head
+    const yoda = new THREE.Shape();
+    yoda.absarc(0, 1.2, 2.8, Math.PI * 0.25, Math.PI * 0.75, false);
+    yoda.lineTo(-5.6, 2.5); // Left ear tip
+    yoda.lineTo(-2.6, -0.4);
+    yoda.lineTo(-1.8, -3.2);
+    yoda.lineTo(0, -3.8); // Chin
+    yoda.lineTo(1.8, -3.2);
+    yoda.lineTo(2.6, -0.4);
+    yoda.lineTo(5.6, 2.5); // Right ear tip
+    yoda.closePath();
+
+    const eyeL = new THREE.Path();
+    eyeL.absarc(-1.4, -0.5, 0.65, 0, Math.PI * 2, true);
+    const eyeR = new THREE.Path();
+    eyeR.absarc(1.4, -0.5, 0.65, 0, Math.PI * 2, true);
+    yoda.holes.push(eyeL, eyeR);
+    shapes.push(yoda);
+  } else if (name.includes('mando')) {
+    // Mandalorian / Boba Fett Helmet with T-Visor
+    const mando = new THREE.Shape();
+    mando.absarc(0, 1.5, 4.4, Math.PI * 0.08, Math.PI * 0.92, false);
+    mando.lineTo(-4.6, -1.5);
+    mando.lineTo(-3.4, -4.6);
+    mando.lineTo(3.4, -4.6);
+    mando.lineTo(4.6, -1.5);
+    mando.closePath();
+
+    // Iconic T-Visor Cutout Hole
+    const tVisor = new THREE.Path();
+    tVisor.moveTo(-3.2, 0.4);
+    tVisor.lineTo(3.2, 0.4);
+    tVisor.lineTo(3.2, -0.6);
+    tVisor.lineTo(0.7, -0.6);
+    tVisor.lineTo(0.7, -3.8);
+    tVisor.lineTo(-0.7, -3.8);
+    tVisor.lineTo(-0.7, -0.6);
+    tVisor.lineTo(-3.2, -0.6);
+    tVisor.closePath();
+    mando.holes.push(tVisor);
+    shapes.push(mando);
+  } else if (name.includes('rebel')) {
+    // Rebel Alliance Starbird Crest
+    const rebel = new THREE.Shape();
+    rebel.moveTo(0, 5.5); // Top spire
+    rebel.lineTo(1.1, 2.4);
+    rebel.quadraticCurveTo(3.2, 3.8, 5.2, 3.8); // Right wing tip
+    rebel.quadraticCurveTo(3.8, 1.0, 3.5, -2.4);
+    rebel.quadraticCurveTo(2.4, -4.4, 0, -5.2); // Tail base
+    rebel.quadraticCurveTo(-2.4, -4.4, -3.5, -2.4);
+    rebel.quadraticCurveTo(-3.8, 1.0, -5.2, 3.8); // Left wing tip
+    rebel.quadraticCurveTo(-3.2, 3.8, -1.1, 2.4);
+    rebel.closePath();
+
+    const core = new THREE.Path();
+    core.absarc(0, -0.8, 1.6, 0, Math.PI * 2, true);
+    rebel.holes.push(core);
+    shapes.push(rebel);
+  } else if (name.includes('empire')) {
+    // Galactic Empire 6-Spoke Cog
+    const empire = new THREE.Shape();
+    empire.absarc(0, 0, 5.4, 0, Math.PI * 2, false);
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI / 3) * i;
+      const hole = new THREE.Path();
+      const r1 = 2.4, r2 = 4.4, w = 0.22;
+      hole.moveTo(r1 * Math.cos(a - w), r1 * Math.sin(a - w));
+      hole.lineTo(r2 * Math.cos(a - w * 0.7), r2 * Math.sin(a - w * 0.7));
+      hole.lineTo(r2 * Math.cos(a + w * 0.7), r2 * Math.sin(a + w * 0.7));
+      hole.lineTo(r1 * Math.cos(a + w), r1 * Math.sin(a + w));
+      hole.closePath();
+      empire.holes.push(hole);
+    }
+    shapes.push(empire);
+  } else if (name.includes('starfleet')) {
+    // Starfleet Delta Insignia
+    const delta = new THREE.Shape();
+    delta.moveTo(0, 5.6); // Top point
+    delta.quadraticCurveTo(2.6, 1.2, 4.2, -4.6); // Right flare
+    delta.quadraticCurveTo(1.8, -2.8, 0, -1.8); // Inner arch
+    delta.quadraticCurveTo(-1.8, -2.8, -4.2, -4.6); // Left flare
+    delta.quadraticCurveTo(-2.6, 1.2, 0, 5.6);
+    delta.closePath();
+
+    const starHole = new THREE.Path();
+    starHole.absarc(0, 0.4, 1.2, 0, Math.PI * 2, true);
+    delta.holes.push(starHole);
+    shapes.push(delta);
+  } else if (name.includes('deathstar')) {
+    // Death Star Sphere with Superlaser Dish
+    const ds = new THREE.Shape();
+    ds.absarc(0, 0, 5.3, 0, Math.PI * 2, false);
+    const dish = new THREE.Path();
+    dish.absarc(2.0, 2.0, 1.6, 0, Math.PI * 2, true);
+    const trench = new THREE.Path();
+    trench.moveTo(-5.2, -0.4);
+    trench.lineTo(5.2, -0.4);
+    trench.lineTo(5.2, 0.4);
+    trench.lineTo(-5.2, 0.4);
+    trench.closePath();
+    ds.holes.push(dish, trench);
+    shapes.push(ds);
+
+    const dot = new THREE.Shape();
+    dot.absarc(2.0, 2.0, 0.65, 0, Math.PI * 2, false);
+    shapes.push(dot);
+
+  // ==========================================
+  // 3. SUPERHEROES & COMICS
+  // ==========================================
+  } else if (name.includes('batman')) {
+    // Batman Bat Wing Symbol
+    const bat = new THREE.Shape();
+    bat.moveTo(0, 2.2); // Head center
+    bat.lineTo(0.7, 3.4); // Right ear
+    bat.lineTo(1.2, 2.2);
+    bat.quadraticCurveTo(3.2, 3.4, 5.6, 2.4); // Right wing tip
+    bat.quadraticCurveTo(4.4, 0.2, 4.2, -1.2);
+    bat.quadraticCurveTo(3.2, 0.2, 2.4, -2.2);
+    bat.quadraticCurveTo(1.2, -0.8, 0, -4.2); // Tail point
+    bat.quadraticCurveTo(-1.2, -0.8, -2.4, -2.2);
+    bat.quadraticCurveTo(-3.2, 0.2, -4.2, -1.2);
+    bat.quadraticCurveTo(-4.4, 0.2, -5.6, 2.4); // Left wing tip
+    bat.quadraticCurveTo(-3.2, 3.4, -1.2, 2.2);
+    bat.lineTo(-0.7, 3.4); // Left ear
+    bat.closePath();
+    shapes.push(bat);
+  } else if (name.includes('superman')) {
+    // Superman Diamond Shield
+    const sm = new THREE.Shape();
+    sm.moveTo(-4.0, 4.2);
+    sm.lineTo(4.0, 4.2);
+    sm.lineTo(5.2, 1.4);
+    sm.lineTo(0, -5.0);
+    sm.lineTo(-5.2, 1.4);
+    sm.closePath();
+
+    const sHole1 = new THREE.Path();
+    sHole1.moveTo(-2.2, 2.8);
+    sHole1.lineTo(2.4, 2.8);
+    sHole1.lineTo(1.8, 1.2);
+    sHole1.lineTo(-1.8, 0.4);
+    sHole1.closePath();
+
+    const sHole2 = new THREE.Path();
+    sHole2.moveTo(1.8, -0.2);
+    sHole2.lineTo(-1.8, -1.0);
+    sHole2.lineTo(0, -3.4);
+    sHole2.lineTo(2.2, -1.8);
+    sHole2.closePath();
+
+    sm.holes.push(sHole1, sHole2);
+    shapes.push(sm);
+  } else if (name.includes('spiderman')) {
+    // Spider-Man Chest Spider
+    const spider = new THREE.Shape();
+    spider.moveTo(0, 3.2);
+    spider.lineTo(1.2, 2.2);
+    spider.lineTo(4.4, 4.4);
+    spider.lineTo(4.8, 3.6);
+    spider.lineTo(2.2, 1.6);
+    spider.lineTo(5.2, 1.4);
+    spider.lineTo(5.2, 0.6);
+    spider.lineTo(1.8, 0.4);
+    spider.lineTo(4.8, -2.4);
+    spider.lineTo(4.2, -3.2);
+    spider.lineTo(1.6, -1.2);
+    spider.lineTo(3.4, -4.6);
+    spider.lineTo(2.6, -5.0);
+    spider.lineTo(0.8, -2.4);
+    spider.lineTo(0, -4.2);
+    spider.lineTo(-0.8, -2.4);
+    spider.lineTo(-2.6, -5.0);
+    spider.lineTo(-3.4, -4.6);
+    spider.lineTo(-1.6, -1.2);
+    spider.lineTo(-4.2, -3.2);
+    spider.lineTo(-4.8, -2.4);
+    spider.lineTo(-1.8, 0.4);
+    spider.lineTo(-5.2, 0.6);
+    spider.lineTo(-5.2, 1.4);
+    spider.lineTo(-2.2, 1.6);
+    spider.lineTo(-4.8, 3.6);
+    spider.lineTo(-4.4, 4.4);
+    spider.lineTo(-1.2, 2.2);
+    spider.closePath();
+    shapes.push(spider);
+  } else if (name.includes('punisher')) {
+    // Punisher Skull
+    const punisher = new THREE.Shape();
+    punisher.absarc(0, 1.2, 4.2, Math.PI * 0.05, Math.PI * 0.95, false);
+    punisher.lineTo(-4.0, -0.8);
+    punisher.lineTo(-2.6, -1.8);
+    punisher.lineTo(-2.6, -4.8);
+    punisher.lineTo(-1.8, -4.8);
+    punisher.lineTo(-1.8, -2.2);
+    punisher.lineTo(-1.1, -2.2);
+    punisher.lineTo(-1.1, -5.2);
+    punisher.lineTo(-0.3, -5.2);
+    punisher.lineTo(-0.3, -2.2);
+    punisher.lineTo(0.3, -2.2);
+    punisher.lineTo(0.3, -5.2);
+    punisher.lineTo(1.1, -5.2);
+    punisher.lineTo(1.1, -2.2);
+    punisher.lineTo(1.8, -2.2);
+    punisher.lineTo(1.8, -4.8);
+    punisher.lineTo(2.6, -4.8);
+    punisher.lineTo(2.6, -1.8);
+    punisher.lineTo(4.0, -0.8);
+    punisher.closePath();
+
+    const eyeL = new THREE.Path();
+    eyeL.moveTo(-2.8, 0.8);
+    eyeL.lineTo(-1.2, 0.2);
+    eyeL.lineTo(-2.2, -0.6);
+    eyeL.closePath();
+
+    const eyeR = new THREE.Path();
+    eyeR.moveTo(2.8, 0.8);
+    eyeR.lineTo(2.2, -0.6);
+    eyeR.lineTo(1.2, 0.2);
+    eyeR.closePath();
+
+    punisher.holes.push(eyeL, eyeR);
+    shapes.push(punisher);
+  } else if (name.includes('deadpool')) {
+    // Deadpool Mask
+    const dp = new THREE.Shape();
+    dp.absarc(0, 0, 5.2, 0, Math.PI * 2, false);
+    const patchL = new THREE.Path();
+    patchL.absellipse(-2.0, 0.4, 1.8, 2.6, 0.2, 0, Math.PI * 2, true);
+    const patchR = new THREE.Path();
+    patchR.absellipse(2.0, 0.4, 1.8, 2.6, -0.2, 0, Math.PI * 2, true);
+    dp.holes.push(patchL, patchR);
+    shapes.push(dp);
+
+    const eyeL = new THREE.Shape();
+    eyeL.moveTo(-2.4, 0.6);
+    eyeL.lineTo(-1.2, 1.0);
+    eyeL.lineTo(-1.6, 0.0);
+    eyeL.closePath();
+
+    const eyeR = new THREE.Shape();
+    eyeR.moveTo(2.4, 0.6);
+    eyeR.lineTo(1.6, 0.0);
+    eyeR.lineTo(1.2, 1.0);
+    eyeR.closePath();
+    shapes.push(eyeL, eyeR);
+
+  // ==========================================
+  // 4. GAMING & RETRO ARCADE
+  // ==========================================
+  } else if (name.includes('invader')) {
+    // Space Invader 8-Bit Alien Sprite
+    const invader = new THREE.Shape();
+    invader.moveTo(-1.2, 4.4);
+    invader.lineTo(-0.4, 4.4);
+    invader.lineTo(-0.4, 3.2);
+    invader.lineTo(0.4, 3.2);
+    invader.lineTo(0.4, 4.4);
+    invader.lineTo(1.2, 4.4);
+    invader.lineTo(1.2, 2.4);
+    invader.lineTo(3.2, 2.4);
+    invader.lineTo(3.2, 1.2);
+    invader.lineTo(4.8, 1.2);
+    invader.lineTo(4.8, -1.4);
+    invader.lineTo(3.4, -1.4);
+    invader.lineTo(3.4, -0.2);
+    invader.lineTo(2.2, -0.2);
+    invader.lineTo(2.2, -2.6);
+    invader.lineTo(3.4, -2.6);
+    invader.lineTo(3.4, -4.4);
+    invader.lineTo(2.0, -4.4);
+    invader.lineTo(2.0, -3.2);
+    invader.lineTo(-2.0, -3.2);
+    invader.lineTo(-2.0, -4.4);
+    invader.lineTo(-3.4, -4.4);
+    invader.lineTo(-3.4, -2.6);
+    invader.lineTo(-2.2, -2.6);
+    invader.lineTo(-2.2, -0.2);
+    invader.lineTo(-3.4, -0.2);
+    invader.lineTo(-3.4, -1.4);
+    invader.lineTo(-4.8, -1.4);
+    invader.lineTo(-4.8, 1.2);
+    invader.lineTo(-3.2, 1.2);
+    invader.lineTo(-3.2, 2.4);
+    invader.lineTo(-1.2, 2.4);
+    invader.closePath();
+
+    const eyeL = new THREE.Path();
+    eyeL.moveTo(-2.2, 1.2);
+    eyeL.lineTo(-1.0, 1.2);
+    eyeL.lineTo(-1.0, 0.0);
+    eyeL.lineTo(-2.2, 0.0);
+    eyeL.closePath();
+
+    const eyeR = new THREE.Path();
+    eyeR.moveTo(1.0, 1.2);
+    eyeR.lineTo(2.2, 1.2);
+    eyeR.lineTo(2.2, 0.0);
+    eyeR.lineTo(1.0, 0.0);
+    eyeR.closePath();
+
+    invader.holes.push(eyeL, eyeR);
+    shapes.push(invader);
+  } else if (name.includes('pacman')) {
+    // Pac-Man & Power Pellet
+    const pacman = new THREE.Shape();
+    pacman.absarc(-1.2, 0, 4.4, 0.52, Math.PI * 2 - 0.52, false);
+    pacman.lineTo(-1.2, 0);
+    pacman.closePath();
+
+    const pellet = new THREE.Shape();
+    pellet.absarc(4.2, 0, 1.2, 0, Math.PI * 2, false);
+    shapes.push(pacman, pellet);
+  } else if (name.includes('triforce')) {
+    // Zelda Golden Triforce (3 Staked Triangles)
+    const tTop = new THREE.Shape();
+    tTop.moveTo(0, 4.8);
+    tTop.lineTo(2.6, 0.4);
+    tTop.lineTo(-2.6, 0.4);
+    tTop.closePath();
+
+    const tLeft = new THREE.Shape();
+    tLeft.moveTo(-2.8, 0.0);
+    tLeft.lineTo(-0.2, -4.4);
+    tLeft.lineTo(-5.4, -4.4);
+    tLeft.closePath();
+
+    const tRight = new THREE.Shape();
+    tRight.moveTo(2.8, 0.0);
+    tRight.lineTo(5.4, -4.4);
+    tRight.lineTo(0.2, -4.4);
+    tRight.closePath();
+
+    shapes.push(tTop, tLeft, tRight);
+  } else if (name.includes('pokeball')) {
+    // Pokémon Pokéball
+    const poke = new THREE.Shape();
+    poke.absarc(0, 0, 5.2, 0, Math.PI * 2, false);
+
+    const band = new THREE.Path();
+    band.moveTo(-5.2, -0.6);
+    band.lineTo(5.2, -0.6);
+    band.lineTo(5.2, 0.6);
+    band.lineTo(-5.2, 0.6);
+    band.closePath();
+
+    const btnOuter = new THREE.Path();
+    btnOuter.absarc(0, 0, 2.2, 0, Math.PI * 2, true);
+    poke.holes.push(band, btnOuter);
+    shapes.push(poke);
+
+    const btn = new THREE.Shape();
+    btn.absarc(0, 0, 1.4, 0, Math.PI * 2, false);
+    const btnHole = new THREE.Path();
+    btnHole.absarc(0, 0, 0.7, 0, Math.PI * 2, true);
+    btn.holes.push(btnHole);
+    shapes.push(btn);
+  } else if (name.includes('mushroom')) {
+    // Super Mario 1-Up Mushroom
+    const shroom = new THREE.Shape();
+    shroom.absarc(0, 0.8, 4.8, 0, Math.PI, false);
+    shroom.lineTo(-5.0, 0.2);
+    shroom.quadraticCurveTo(-4.0, -1.2, -2.6, -1.2);
+    shroom.lineTo(-2.4, -4.4);
+    shroom.lineTo(2.4, -4.4);
+    shroom.lineTo(2.6, -1.2);
+    shroom.quadraticCurveTo(4.0, -1.2, 5.0, 0.2);
+    shroom.closePath();
+
+    const spotTop = new THREE.Path();
+    spotTop.absarc(0, 3.2, 1.4, 0, Math.PI * 2, true);
+    const spotL = new THREE.Path();
+    spotL.absarc(-3.2, 1.4, 1.1, 0, Math.PI * 2, true);
+    const spotR = new THREE.Path();
+    spotR.absarc(3.2, 1.4, 1.1, 0, Math.PI * 2, true);
+    shroom.holes.push(spotTop, spotL, spotR);
+    shapes.push(shroom);
+  } else if (name.includes('aperture')) {
+    // Portal Aperture Science Iris
+    const ap = new THREE.Shape();
+    ap.absarc(0, 0, 5.3, 0, Math.PI * 2, false);
+    const centerHole = new THREE.Path();
+    centerHole.absarc(0, 0, 1.8, 0, Math.PI * 2, true);
+    ap.holes.push(centerHole);
+    for (let i = 0; i < 8; i++) {
+      const a = (Math.PI / 4) * i;
+      const slit = new THREE.Path();
+      const x1 = 1.8 * Math.cos(a), y1 = 1.8 * Math.sin(a);
+      const x2 = 5.2 * Math.cos(a + 0.5), y2 = 5.2 * Math.sin(a + 0.5);
+      slit.moveTo(x1, y1);
+      slit.lineTo(x2, y2);
+      slit.lineTo(x2 + 0.3 * Math.sin(a), y2 - 0.3 * Math.cos(a));
+      slit.lineTo(x1 + 0.3 * Math.sin(a), y1 - 0.3 * Math.cos(a));
+      slit.closePath();
+      ap.holes.push(slit);
+    }
+    shapes.push(ap);
+  } else if (name.includes('halflife')) {
+    // Half-Life Lambda (λ)
+    const lambdaRing = new THREE.Shape();
+    lambdaRing.absarc(0, 0, 5.4, 0, Math.PI * 2, false);
+    const ringHole = new THREE.Path();
+    ringHole.absarc(0, 0, 4.2, 0, Math.PI * 2, true);
+    lambdaRing.holes.push(ringHole);
+    shapes.push(lambdaRing);
+
+    const lambda = new THREE.Shape();
+    lambda.moveTo(-2.4, -3.4);
+    lambda.lineTo(-1.2, -3.4);
+    lambda.lineTo(1.4, 3.4);
+    lambda.lineTo(0.2, 3.4);
+    lambda.lineTo(-0.6, 0.4);
+    lambda.lineTo(1.6, -3.4);
+    lambda.lineTo(2.8, -3.4);
+    lambda.lineTo(0.2, 0.4);
+    lambda.closePath();
+    shapes.push(lambda);
+
+  // ==========================================
+  // 5. OPEN SOURCE, TECH & SPACE
+  // ==========================================
+  } else if (name.includes('tux')) {
+    // Linux Tux Penguin Silhouette
+    const tux = new THREE.Shape();
+    tux.absarc(0, 2.4, 2.2, Math.PI * 0.15, Math.PI * 0.85, false);
+    tux.quadraticCurveTo(-4.6, 1.2, -4.8, -1.6);
+    tux.quadraticCurveTo(-3.8, -1.6, -2.8, -0.6);
+    tux.lineTo(-2.6, -4.4);
+    tux.lineTo(-1.0, -4.4);
+    tux.lineTo(-0.8, -3.4);
+    tux.lineTo(0.8, -3.4);
+    tux.lineTo(1.0, -4.4);
+    tux.lineTo(2.6, -4.4);
+    tux.lineTo(2.8, -0.6);
+    tux.quadraticCurveTo(3.8, -1.6, 4.8, -1.6);
+    tux.quadraticCurveTo(4.6, 1.2, 2.2, 2.4);
+    tux.closePath();
+
+    const belly = new THREE.Path();
+    belly.absellipse(0, -1.2, 1.6, 2.0, 0, 0, Math.PI * 2, true);
+    tux.holes.push(belly);
+    shapes.push(tux);
+  } else if (name.includes('octocat')) {
+    // GitHub Octocat Silhouette
+    const octo = new THREE.Shape();
+    octo.moveTo(0, 2.8);
+    octo.lineTo(2.4, 2.8);
+    octo.lineTo(4.4, 4.8); // Right ear tip
+    octo.lineTo(4.2, 1.8);
+    octo.quadraticCurveTo(5.2, -0.8, 3.6, -3.2);
+    octo.quadraticCurveTo(1.8, -4.6, 0, -4.6);
+    octo.quadraticCurveTo(-1.8, -4.6, -3.6, -3.2);
+    octo.quadraticCurveTo(-5.2, -0.8, -4.2, 1.8);
+    octo.lineTo(-4.4, 4.8); // Left ear tip
+    octo.lineTo(-2.4, 2.8);
+    octo.closePath();
+    shapes.push(octo);
+  } else if (name.includes('nasa')) {
+    // NASA Vector Insignia
+    const nasa = new THREE.Shape();
+    nasa.moveTo(-4.6, -2.8);
+    nasa.lineTo(4.8, 3.4);
+    nasa.lineTo(1.8, 0.4);
+    nasa.lineTo(4.4, -4.2);
+    nasa.lineTo(0.6, -1.2);
+    nasa.lineTo(-3.6, -3.6);
+    nasa.closePath();
+
+    const orbit = new THREE.Shape();
+    orbit.absellipse(0, 0, 5.2, 2.4, 0.4, 0, Math.PI * 2, false);
+    const orbitHole = new THREE.Path();
+    orbitHole.absellipse(0, 0, 4.2, 1.6, 0.4, 0, Math.PI * 2, true);
+    orbit.holes.push(orbitHole);
+    shapes.push(nasa, orbit);
+  } else {
+    // Default fallback to Google Cloud
+    const cloud = new THREE.Shape();
+    cloud.moveTo(-5.4, -2.2);
+    cloud.lineTo(5.4, -2.2);
+    cloud.absarc(4.2, 0.0, 2.5, -Math.PI / 2, Math.PI / 4, false);
+    cloud.absarc(1.8, 2.5, 3.0, 0, Math.PI * 0.75, false);
+    cloud.absarc(-2.2, 1.8, 2.7, Math.PI * 0.3, Math.PI * 0.95, false);
+    cloud.absarc(-4.2, -0.2, 2.2, Math.PI * 0.8, Math.PI * 1.5, false);
+    cloud.closePath();
+    shapes.push(cloud);
   }
 
   return shapes;

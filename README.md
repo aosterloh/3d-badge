@@ -12,13 +12,13 @@ Designed for Google Munich Maker Space printers (Prusa MK3/MK4, Ultimaker, Bambu
   - **Classic Plain Edge**: Traditional clean perimeter with straight edges.
   - **Wave Edge**: Ergonomic scalloped grip contours along sides.
 - **Bed-Anchored Corner Medallion**: Solid circular base disc in the lower right corner anchored to the print plate, housing the emblem with 0° overhangs.
-- **Top 5 Google Service Emblems**:
-  - Google Cloud
-  - Android
-  - Google Chrome
-  - YouTube
-  - Google DeepMind / Gemini
-  - *+ Custom Team Logo / Text* (SVG upload or custom team monogram)
+- **Dual-Category Medallion Emblems**:
+  - **Google Brands & Services**: Google Cloud, Android Bugdroid, Google Chrome, YouTube, Gemini / DeepMind.
+  - **22 Pop Culture & Geek Icons**:
+    - *Star Wars & Sci-Fi*: Darth Vader, Master Yoda, Mandalorian (Boba Fett), Rebel Alliance, Galactic Empire, Starfleet Delta, Death Star.
+    - *Superheroes*: Batman, Superman, Spider-Man, Punisher Skull, Deadpool.
+    - *Gaming & Retro Arcade*: Space Invader, Pac-Man, Zelda Triforce, Pokéball, Super Mario Mushroom, Aperture Science (Portal), Half-Life Lambda.
+    - *Open Source & Space*: Linux Tux, GitHub Octocat, NASA Vector Insignia.
 - **Multi-Material & Slicing Optimizations**:
   - **Watertight Manifold Topology**: Spatial vertex welding engine eliminates non-manifold open edges for error-free slicer import.
   - **Volumetric Z-Lock Penetration**: 0.20 mm (1 full layer) volumetric emblem inset into the host body, ensuring multi-filament AMS/MMU engines carve an interlocking cavity without dropping layers.

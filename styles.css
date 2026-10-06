@@ -1743,5 +1743,39 @@ input[type="range"] {
   cursor: pointer;
 }
 
+/* Dual Logo Selectors & Dropdowns */
+.logo-dropdown-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
+.full-width-select {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid #dadce0;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #202124;
+  background-color: #ffffff;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
 
+.full-width-select:focus {
+  border-color: var(--google-blue);
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+}
+
+.full-width-select optgroup {
+  font-weight: 700;
+  color: #5f6368;
+  padding: 4px 0;
+}
+
+.full-width-select option {
+  font-weight: 500;
+  color: #202124;
+}

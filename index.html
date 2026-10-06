@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Google Badge 3D Customizer &amp; STL Generator</title>
-  <link rel="stylesheet" href="styles.css?v=v13_bambu_watertight">
+  <link rel="stylesheet" href="styles.css?v=v14_popculture_emblems">
   <!-- Favicon Google Colors -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%234285F4%22/></svg>">
 </head>
@@ -213,18 +213,62 @@
             <span class="badge-pill-tag">Single Medallion</span>
           </div>
 
-          <!-- Single Lower-Right Logo Selector -->
-          <div class="single-logo-selector-wrapper" style="margin-top: 10px;">
-            <label for="selectLowerRightLogo" style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:6px;">Select Service Logo:</label>
-            <select id="selectLowerRightLogo" class="full-width-select" style="width:100%; padding:9px 12px; border-radius:8px; border:1px solid #dadce0; font-size:0.9rem; font-weight:500; background:#fff; cursor:pointer;">
-              <option value="cloud" selected>Google Cloud</option>
-              <option value="android">Android</option>
-              <option value="chrome">Google Chrome</option>
-              <option value="youtube">YouTube</option>
-              <option value="deepmind">Google Gemini / DeepMind</option>
-              <option value="custom">Team Custom (SVG / Monogram)</option>
-              <option value="none">None (Plain Medallion)</option>
-            </select>
+          <!-- Dual Coordinated Logo Selectors -->
+          <div class="logo-dropdown-stack" style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+            <!-- Dropdown 1: Google Services -->
+            <div class="single-logo-selector-wrapper">
+              <label for="selectGoogleLogo" style="font-size:0.78rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">
+                Google Brands &amp; Services:
+              </label>
+              <select id="selectGoogleLogo" class="full-width-select" style="width:100%; padding:9px 12px; border-radius:8px; border:1px solid #dadce0; font-size:0.88rem; font-weight:500; background:#fff; cursor:pointer;">
+                <option value="cloud" selected>Google Cloud</option>
+                <option value="android">Android Bugdroid</option>
+                <option value="chrome">Google Chrome</option>
+                <option value="youtube">YouTube</option>
+                <option value="deepmind">Google Gemini / DeepMind</option>
+                <option value="none">— None (Use Pop Culture / Off) —</option>
+              </select>
+            </div>
+
+            <!-- Dropdown 2: Pop Culture & Geek Icons -->
+            <div class="single-logo-selector-wrapper">
+              <label for="selectPopCultureLogo" style="font-size:0.78rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">
+                Pop Culture &amp; Geek Icons:
+              </label>
+              <select id="selectPopCultureLogo" class="full-width-select" style="width:100%; padding:9px 12px; border-radius:8px; border:1px solid #dadce0; font-size:0.88rem; font-weight:500; background:#fff; cursor:pointer;">
+                <option value="none" selected>— None (Use Google Logo / Off) —</option>
+                <optgroup label="🌌 Star Wars &amp; Sci-Fi">
+                  <option value="vader">Darth Vader</option>
+                  <option value="yoda">Master Yoda</option>
+                  <option value="mando">Mandalorian (Boba Fett)</option>
+                  <option value="rebel">Rebel Alliance Starbird</option>
+                  <option value="empire">Galactic Empire Cog</option>
+                  <option value="starfleet">Starfleet Delta (Star Trek)</option>
+                  <option value="deathstar">Death Star</option>
+                </optgroup>
+                <optgroup label="🦇 Superheroes &amp; Comics">
+                  <option value="batman">Batman (Dark Knight)</option>
+                  <option value="superman">Superman Shield</option>
+                  <option value="spiderman">Spider-Man</option>
+                  <option value="punisher">Punisher Skull</option>
+                  <option value="deadpool">Deadpool</option>
+                </optgroup>
+                <optgroup label="👾 Gaming &amp; Retro Arcade">
+                  <option value="invader">Space Invader</option>
+                  <option value="pacman">Pac-Man &amp; Pellet</option>
+                  <option value="triforce">Zelda Triforce</option>
+                  <option value="pokeball">Pokéball</option>
+                  <option value="mushroom">Super Mario Mushroom</option>
+                  <option value="aperture">Aperture Science (Portal)</option>
+                  <option value="halflife">Half-Life Lambda (λ)</option>
+                </optgroup>
+                <optgroup label="🐧 Open Source, Tech &amp; Space">
+                  <option value="tux">Linux Tux Penguin</option>
+                  <option value="octocat">GitHub Octocat</option>
+                  <option value="nasa">NASA Vector Insignia</option>
+                </optgroup>
+              </select>
+            </div>
           </div>
 
           <!-- 3D Relief Style & Overhang Status -->
@@ -252,18 +296,6 @@
               <button class="logo-color-swatch" style="background:#FBBC04;" data-logo-color="#FBBC04" data-name="Google Yellow" title="Google Yellow"></button>
               <button class="logo-color-swatch" style="background:#34A853;" data-logo-color="#34A853" data-name="Google Green" title="Google Green"></button>
               <button class="logo-color-swatch" style="background:#202124;" data-logo-color="#202124" data-name="Stealth Black" title="Stealth Black"></button>
-            </div>
-          </div>
-
-          <!-- Custom Team Input (Shown when at least one corner has "Team Custom") -->
-          <div id="customTeamBox" class="custom-team-box" style="display:none;">
-            <span style="font-size:0.8rem; font-weight:600;">Custom Team Monogram / SVG:</span>
-            <div class="input-row">
-              <input type="text" id="customTeamInput" class="text-input" placeholder="e.g. Cloud AI, DeepMind" value="Cloud AI" maxlength="10">
-              <label class="btn-primary" style="padding:6px 12px; font-size:0.8rem; cursor:pointer;">
-                Upload SVG
-                <input type="file" id="customSvgInput" accept=".svg" style="display:none;">
-              </label>
             </div>
           </div>
         </section>
@@ -553,7 +585,7 @@
   <script src="libs/SVGLoader.js"></script>
   <script src="libs/jszip.min.js"></script>
   <script src="images/badge_base64.js"></script>
-  <script src="generator.js?v=v13_bambu_watertight"></script>
-  <script src="app.js?v=v13_bambu_watertight"></script>
+  <script src="generator.js?v=v14_popculture_emblems"></script>
+  <script src="app.js?v=v14_popculture_emblems"></script>
 </body>
 </html>

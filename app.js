@@ -4,10 +4,19 @@
  * Supports 0 to 4 Corner Logos (Max 15x15mm each) matching the frame color
  */
 
+// Available Emblems Pools
+const GOOGLE_LOGOS = ['cloud', 'android', 'chrome', 'youtube', 'deepmind'];
+const POPCULTURE_LOGOS = [
+  'vader', 'yoda', 'mando', 'rebel', 'empire', 'starfleet', 'deathstar',
+  'batman', 'superman', 'spiderman', 'punisher', 'deadpool',
+  'invader', 'pacman', 'triforce', 'pokeball', 'mushroom', 'aperture', 'halflife',
+  'tux', 'octocat', 'nasa'
+];
+const ALL_AVAILABLE_LOGOS = [...GOOGLE_LOGOS, ...POPCULTURE_LOGOS];
+
 // Helper to pick random logo for the lower-right corner medallion
 function getRandomCornerLogos() {
-  const logoPool = ['cloud', 'android', 'chrome', 'youtube', 'deepmind'];
-  const chosen = logoPool[Math.floor(Math.random() * logoPool.length)];
+  const chosen = ALL_AVAILABLE_LOGOS[Math.floor(Math.random() * ALL_AVAILABLE_LOGOS.length)];
   return {
     'top-left': 'none',
     'top-right': 'none',
@@ -675,36 +684,80 @@ function initUIHandlers() {
     });
   });
 
-  // 3. Lower-Right Corner Logo Selector
-  const singleLogoSelect = document.getElementById('selectLowerRightLogo');
+  // 3. Lower-Right Corner Dual Coordinated Logo Selectors (Google vs Pop Culture)
+  const selectGoogleLogo = document.getElementById('selectGoogleLogo');
+  const selectPopCultureLogo = document.getElementById('selectPopCultureLogo');
   const countLabel = document.getElementById('activeLogoCountLabel');
-  const customBox = document.getElementById('customTeamBox');
 
   function updateCornerUI() {
     const val = (state.corners && state.corners['bottom-right']) ? state.corners['bottom-right'] : 'cloud';
-    if (singleLogoSelect) {
-      singleLogoSelect.value = val;
+
+    if (GOOGLE_LOGOS.includes(val)) {
+      if (selectGoogleLogo) selectGoogleLogo.value = val;
+      if (selectPopCultureLogo) selectPopCultureLogo.value = 'none';
+    } else if (POPCULTURE_LOGOS.includes(val)) {
+      if (selectGoogleLogo) selectGoogleLogo.value = 'none';
+      if (selectPopCultureLogo) selectPopCultureLogo.value = val;
+    } else {
+      // 'none' (plain medallion)
+      if (selectGoogleLogo) selectGoogleLogo.value = 'none';
+      if (selectPopCultureLogo) selectPopCultureLogo.value = 'none';
     }
-    const hasCustom = (val === 'custom');
+
     if (countLabel) {
       countLabel.textContent = (val !== 'none') ? 'Bed-Anchored (Zero Overhang)' : 'Plain Medallion';
     }
-    if (customBox) {
-      customBox.style.display = hasCustom ? 'flex' : 'none';
-      if (hasCustom && !state.customSvgShapes) {
-        generateCustomTextShapes();
-      }
-    }
   }
 
-  if (singleLogoSelect) {
-    singleLogoSelect.addEventListener('change', (e) => {
-      state.corners = {
-        'top-left': 'none',
-        'top-right': 'none',
-        'bottom-left': 'none',
-        'bottom-right': e.target.value
-      };
+  if (selectGoogleLogo) {
+    selectGoogleLogo.addEventListener('change', (e) => {
+      const chosen = e.target.value;
+      if (chosen !== 'none') {
+        if (selectPopCultureLogo) selectPopCultureLogo.value = 'none';
+        state.corners = {
+          'top-left': 'none',
+          'top-right': 'none',
+          'bottom-left': 'none',
+          'bottom-right': chosen
+        };
+      } else {
+        // Switched Google to None: if Pop Culture is also None, state is none
+        if (!selectPopCultureLogo || selectPopCultureLogo.value === 'none') {
+          state.corners = {
+            'top-left': 'none',
+            'top-right': 'none',
+            'bottom-left': 'none',
+            'bottom-right': 'none'
+          };
+        }
+      }
+      updateCornerUI();
+      updateHolderAssembly();
+    });
+  }
+
+  if (selectPopCultureLogo) {
+    selectPopCultureLogo.addEventListener('change', (e) => {
+      const chosen = e.target.value;
+      if (chosen !== 'none') {
+        if (selectGoogleLogo) selectGoogleLogo.value = 'none';
+        state.corners = {
+          'top-left': 'none',
+          'top-right': 'none',
+          'bottom-left': 'none',
+          'bottom-right': chosen
+        };
+      } else {
+        // Switched Pop Culture to None: if Google is also None, state is none
+        if (!selectGoogleLogo || selectGoogleLogo.value === 'none') {
+          state.corners = {
+            'top-left': 'none',
+            'top-right': 'none',
+            'bottom-left': 'none',
+            'bottom-right': 'none'
+          };
+        }
+      }
       updateCornerUI();
       updateHolderAssembly();
     });
@@ -719,41 +772,6 @@ function initUIHandlers() {
       updateHolderAssembly();
     });
   });
-
-  // 5. Custom Team Text / SVG Upload
-  const customTextInput = document.getElementById('customTeamInput');
-  if (customTextInput) {
-    customTextInput.addEventListener('input', (e) => {
-      state.customText = e.target.value.trim() || 'GOOG';
-      generateCustomTextShapes();
-      updateHolderAssembly();
-    });
-  }
-
-  const customSvgInput = document.getElementById('customSvgInput');
-  if (customSvgInput) {
-    customSvgInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          try {
-            const loader = new THREE.SVGLoader();
-            const svgData = loader.parse(evt.target.result);
-            const shapes = [];
-            svgData.paths.forEach(p => shapes.push(...p.toShapes(true)));
-            if (shapes.length > 0) {
-              state.customSvgShapes = shapes;
-              updateHolderAssembly();
-            }
-          } catch (err) {
-            console.error("Failed to parse custom SVG", err);
-          }
-        };
-        reader.readAsText(file);
-      }
-    });
-  }
 
   // 6. Advanced Dimensions & Custom Fit
   initAdvancedDimensionsUI();

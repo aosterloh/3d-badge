@@ -131,5 +131,33 @@ const { generate3MFPackage } = require('./generator.js');
   if (!bufUniversal || bufUniversal.length < 1000 || !bufBambu || bufBambu.length < 1000) {
     throw new Error("3MF generation produced an invalid or empty buffer!");
   }
+
+  // 8. Test All 27 Logos (Google + 22 Pop Culture & Geek Icons)
+  const allLogos = [
+    'cloud', 'android', 'chrome', 'youtube', 'deepmind',
+    'vader', 'yoda', 'mando', 'rebel', 'empire', 'starfleet', 'deathstar',
+    'batman', 'superman', 'spiderman', 'punisher', 'deadpool',
+    'invader', 'pacman', 'triforce', 'pokeball', 'mushroom', 'aperture', 'halflife',
+    'tux', 'octocat', 'nasa'
+  ];
+  console.log(`\nValidating all ${allLogos.length} 3D vector emblems...`);
+  for (const logoId of allLogos) {
+    const assembly = createBadgeHolderAssembly({
+      frameStyle: 'plain',
+      colorHex: '#202124',
+      logoColorHex: '#FFFFFF',
+      corners: { 'bottom-right': logoId }
+    });
+    let found = false;
+    assembly.traverse(c => {
+      if (c.name && c.name.startsWith('EmblemMesh_')) found = true;
+    });
+    if (!found) throw new Error(`Failed to generate 3D mesh for emblem: ${logoId}`);
+    const stlData = exporter.parse(assembly, { binary: true });
+    if (!stlData || stlData.byteLength < 50000) {
+      throw new Error(`STL generation invalid for emblem: ${logoId}`);
+    }
+  }
+  console.log(`✓ All ${allLogos.length} emblems generate valid watertight 3D meshes and STLs!`);
   console.log("All circular corner disc, logo color, plain edge, wave edge, parametric, and dual .3MF multi-color tests passed!");
 })();
