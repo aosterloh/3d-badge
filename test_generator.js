@@ -158,6 +158,59 @@ const { generate3MFPackage } = require('./generator.js');
       throw new Error(`STL generation invalid for emblem: ${logoId}`);
     }
   }
-  console.log(`✓ All ${allLogos.length} emblems generate valid watertight 3D meshes and STLs!`);
-  console.log("All circular corner disc, logo color, plain edge, wave edge, parametric, and dual .3MF multi-color tests passed!");
+  // 9. Strict Topology Assertion: Guarantee 0 Non-Manifold Edges and 0 Open Edges in 3MF
+  console.log("\nVerifying 3MF topology (asserting 0 non-manifold edges and 0 open edges)...");
+  for (const style of ['plain', 'wave']) {
+    for (const logoId of ['cloud', 'vader', 'invader', 'pokeball', 'aperture', 'halflife', 'nasa', 'deathstar']) {
+      const assembly = createBadgeHolderAssembly({
+        frameStyle: style,
+        colorHex: '#202124',
+        logoColorHex: '#FBBC04',
+        corners: { 'bottom-right': logoId }
+      });
+      const buf = await generate3MFPackage(THREE, JSZip, assembly, { isBambu: true });
+      const zip = await JSZip.loadAsync(buf);
+      const modelXml = await zip.file('3D/3dmodel.model').async('string');
+
+      const objectRegex = /<object id="(\d+)" type="model" name="([^"]+)"[^>]*>([\s\S]*?)<\/object>/g;
+      let match;
+      while ((match = objectRegex.exec(modelXml)) !== null) {
+        const name = match[2];
+        const body = match[3];
+        if (!body.includes('<mesh>')) continue;
+
+        const triangles = [];
+        const tRegex = /<triangle v1="(\d+)" v2="(\d+)" v3="(\d+)"\/>/g;
+        let tMatch;
+        while ((tMatch = tRegex.exec(body)) !== null) {
+          triangles.push({ v1: Number(tMatch[1]), v2: Number(tMatch[2]), v3: Number(tMatch[3]) });
+        }
+
+        const edgeMap = new Map();
+        triangles.forEach(t => {
+          const edges = [
+            [Math.min(t.v1, t.v2), Math.max(t.v1, t.v2)],
+            [Math.min(t.v2, t.v3), Math.max(t.v2, t.v3)],
+            [Math.min(t.v3, t.v1), Math.max(t.v3, t.v1)]
+          ];
+          edges.forEach(([a, b]) => {
+            const key = a + '_' + b;
+            edgeMap.set(key, (edgeMap.get(key) || 0) + 1);
+          });
+        });
+
+        let open = 0, nonManifold = 0;
+        for (const count of edgeMap.values()) {
+          if (count === 1) open++;
+          if (count > 2) nonManifold++;
+        }
+
+        if (open > 0 || nonManifold > 0) {
+          throw new Error(`Topology failure in ${style} / ${logoId} / ${name}: open=${open}, nonManifold=${nonManifold}`);
+        }
+      }
+    }
+  }
+  console.log("✓ 3MF Topology validated: 0 non-manifold edges, 0 open edges across all styles and logos!");
+  console.log("All circular corner disc, logo color, plain edge, wave edge, parametric, watertight topology, and dual .3MF multi-color tests passed!");
 })();

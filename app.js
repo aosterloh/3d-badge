@@ -84,11 +84,11 @@ let holderAssembly = null;
 let badgeMesh = null;
 let badgeTexture = null;
 
-// Intro 360° X-axis flip animation state
+// Intro 3D Multi-Axis Swivel Showcase Animation State
 let introAnimation = {
   active: false,
   startTime: 0,
-  duration: 2300, // 2.3 seconds smooth showcase flip
+  duration: 3000, // 3.0 seconds smooth multi-axis 3D turntable swivel
   pendingVisibility: false
 };
 
@@ -101,14 +101,14 @@ function startIntroXFlip() {
   introAnimation.pendingVisibility = false;
   introAnimation.active = true;
   introAnimation.startTime = performance.now();
-  if (badgePivotGroup) badgePivotGroup.rotation.x = 0;
+  if (badgePivotGroup) badgePivotGroup.rotation.set(0, Math.PI * 2, 0);
 
   const hintPill = document.querySelector('.orbit-hint-pill');
   if (hintPill) {
     hintPill.classList.add('pulse');
     setTimeout(() => {
       if (hintPill) hintPill.classList.remove('pulse');
-    }, 2500);
+    }, 3200);
   }
 }
 
@@ -116,7 +116,7 @@ function cancelIntroXFlip() {
   introAnimation.pendingVisibility = false;
   if (introAnimation.active) {
     introAnimation.active = false;
-    if (badgePivotGroup) badgePivotGroup.rotation.x = 0;
+    if (badgePivotGroup) badgePivotGroup.rotation.set(0, 0, 0);
     const hintPill = document.querySelector('.orbit-hint-pill');
     if (hintPill) hintPill.classList.remove('pulse');
   }
@@ -1118,7 +1118,7 @@ function showToast(message) {
 function animate() {
   requestAnimationFrame(animate);
 
-  // Smooth 360° X-Axis Showcase Flip
+  // Smooth 3D Multi-Axis Opening Swivel (Y turntable yaw, X card slot pitch, Z perspective roll)
   if (introAnimation.active && badgePivotGroup) {
     const elapsed = performance.now() - introAnimation.startTime;
     const progress = Math.min(elapsed / introAnimation.duration, 1.0);
@@ -1128,12 +1128,18 @@ function animate() {
       ? 4 * progress * progress * progress
       : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
-    // Full 360-degree rotation around horizontal X axis (top tilts away, reveals slot, flips around to back, and returns to front)
-    badgePivotGroup.rotation.x = ease * Math.PI * 2;
+    // Y-axis (turntable yaw spin): Smooth 360-degree rotation returning precisely to 0
+    badgePivotGroup.rotation.y = (1.0 - ease) * Math.PI * 2;
+
+    // X-axis (pitch tilt): Gentle forward & back tilt revealing top pocket opening and lanyard tab
+    badgePivotGroup.rotation.x = Math.sin(progress * Math.PI) * 0.45;
+
+    // Z-axis (roll tilt): Subtle dynamic roll emphasizing 3D thickness and embossed relief
+    badgePivotGroup.rotation.z = Math.sin(progress * Math.PI * 2) * 0.14;
 
     if (progress >= 1.0) {
       introAnimation.active = false;
-      badgePivotGroup.rotation.x = 0;
+      badgePivotGroup.rotation.set(0, 0, 0);
     }
   }
 
