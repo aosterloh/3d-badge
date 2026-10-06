@@ -1,0 +1,19 @@
+{
+  "name": "google-badge-holder",
+  "version": "1.0.0",
+  "description": "Parametric 3D printable holder for Google employee badges with real-time 3D WebGL preview and STL export",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test_generator.js"
+  },
+  "keywords": [
+    "google-badge",
+    "3d-printing",
+    "threejs",
+    "stl-generator",
+    "badge-holder"
+  ],
+  "author": "Alex Osterloh",
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,40 @@
+{
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Badge 3D Customizer",
+        "supportEmail": "aosterloh@gmail.com"
+      }
+    }
+  },
+  "hosting": {
+    "site": "badge-3d-customizer",
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "Dockerfile",
+      ".dockerignore",
+      "deploy.sh",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css|html)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, must-revalidate"
+          }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
