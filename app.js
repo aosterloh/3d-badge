@@ -1160,19 +1160,15 @@ function animate() {
 }
 
 // ==============================================================================
-// SECURITY & DUAL GATE AUTHENTICATION (Google Corporate Sign-In + Passcode Fallback)
-// Mandatory Passcode: "Cloudspac5"
-// Corporate Domain: @google.com
+// SECURITY: GOOGLE CORPORATE AUTHENTICATION GATE (Firebase Google Workspace SSO)
+// Restricted Exclusively to @google.com accounts (Matching GE-Global configuration)
 // ==============================================================================
-const REQUIRED_PASSWORD = "Cloudspac5";
-
 const firebaseConfig = {
-  apiKey: "AIzaSyCSfXvqsDb182855Qsvh1nbqThkOalDwLA",
-  authDomain: "techno-machine.firebaseapp.com",
-  projectId: "techno-machine",
-  storageBucket: "techno-machine.firebasestorage.app",
-  messagingSenderId: "478149822613",
-  appId: "1:478149822613:web:ba07416fb03fda5fb1339c"
+  apiKey: "AIzaSyBDfu44ElID27cy2lvozY2BD1izTq7AIuo",
+  authDomain: "aosterloh-cs-muc.firebaseapp.com",
+  projectId: "aosterloh-cs-muc",
+  storageBucket: "aosterloh-cs-muc.appspot.com",
+  appId: "1:557450838719:web:5e51f"
 };
 
 let firebaseAuthInstance = null;
@@ -1180,33 +1176,32 @@ let firebaseAppInstance = null;
 let GoogleAuthProviderClass = null;
 let signInWithPopupFn = null;
 let signOutFn = null;
+let onAuthStateChangedFn = null;
 
 async function getFirebaseAuthService() {
   if (!firebaseAuthInstance) {
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js');
-    const { getAuth, GoogleAuthProvider, signInWithPopup, signOut } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
+    const { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
     firebaseAppInstance = initializeApp(firebaseConfig);
     firebaseAuthInstance = getAuth(firebaseAppInstance);
     GoogleAuthProviderClass = GoogleAuthProvider;
     signInWithPopupFn = signInWithPopup;
     signOutFn = signOut;
+    onAuthStateChangedFn = onAuthStateChanged;
   }
   return {
     auth: firebaseAuthInstance,
     provider: new GoogleAuthProviderClass(),
     signInWithPopup: signInWithPopupFn,
-    signOut: signOutFn
+    signOut: signOutFn,
+    onAuthStateChanged: onAuthStateChangedFn
   };
 }
 
 function initAuthGate() {
   const authOverlay = document.getElementById('auth-overlay');
   const authCard = document.getElementById('authCard');
-  const authForm = document.getElementById('authForm');
-  const authPassword = document.getElementById('authPassword');
   const authStatusMsg = document.getElementById('authStatusMsg');
-  const btnTogglePwd = document.getElementById('btnTogglePwd');
-  const btnAuthUnlock = document.getElementById('btnAuthUnlock');
   const btnGoogleSignIn = document.getElementById('btnGoogleSignIn');
   const btnLockApp = document.getElementById('btnLockApp');
   const userProfilePill = document.getElementById('userProfilePill');
@@ -1263,15 +1258,11 @@ function initAuthGate() {
       }
     }
 
-    if (authPassword) authPassword.value = '';
     if (authStatusMsg) {
       authStatusMsg.textContent = '';
       authStatusMsg.className = 'auth-status-msg';
     }
     authOverlay.classList.remove('unlocked');
-    setTimeout(() => {
-      if (authPassword) authPassword.focus();
-    }, 150);
   }
 
   // 1. Google Corporate Sign-in Handler (@google.com)
@@ -1314,9 +1305,12 @@ function initAuthGate() {
         } else {
           // Reject non-google.com domain
           await signOut(auth);
+          sessionStorage.removeItem('google_badge_auth');
+          sessionStorage.removeItem('google_badge_user');
+          clearUserProfile();
           if (authStatusMsg) {
             authStatusMsg.className = 'auth-status-msg error';
-            authStatusMsg.textContent = `✕ ${email || 'Account'} is not an @google.com corporate account. Access restricted.`;
+            authStatusMsg.textContent = `✕ Access Denied: You authenticated with ${email}. Only @google.com accounts are permitted.`;
           }
           if (authCard) {
             authCard.classList.remove('shake');
@@ -1329,86 +1323,21 @@ function initAuthGate() {
         if (err.code === 'auth/popup-closed-by-user') {
           if (authStatusMsg) {
             authStatusMsg.className = 'auth-status-msg';
-            authStatusMsg.textContent = 'Sign-in cancelled. You can also use the passcode below.';
+            authStatusMsg.textContent = 'Sign-in cancelled. Please click the button to sign in.';
           }
         } else if (err.code === 'auth/popup-blocked') {
           if (authStatusMsg) {
             authStatusMsg.className = 'auth-status-msg error';
-            authStatusMsg.textContent = '✕ Sign-in popup was blocked. Please allow popups or use passcode.';
+            authStatusMsg.textContent = '✕ Sign-in popup was blocked by browser. Please allow popups for this site.';
           }
         } else {
           if (authStatusMsg) {
             authStatusMsg.className = 'auth-status-msg error';
-            authStatusMsg.textContent = `✕ Sign-in notice: ${err.message || 'Please use team passcode below.'}`;
+            authStatusMsg.textContent = `✕ Sign-in notice: ${err.message || 'Authentication failed.'}`;
           }
         }
       } finally {
         btnGoogleSignIn.disabled = false;
-      }
-    });
-  }
-
-  // 2. Secondary Passcode Fallback Handler ("Cloudspac5")
-  function handlePasscodeSubmit() {
-    const inputVal = authPassword ? authPassword.value.trim() : '';
-    if (inputVal === REQUIRED_PASSWORD) {
-      const userData = {
-        displayName: 'Team Member',
-        email: 'Demo Passcode',
-        photoURL: ''
-      };
-      sessionStorage.setItem('google_badge_auth', 'granted');
-      sessionStorage.setItem('google_badge_user', JSON.stringify(userData));
-      renderUserProfile(userData);
-
-      if (authStatusMsg) {
-        authStatusMsg.className = 'auth-status-msg success';
-        authStatusMsg.textContent = '✓ Passcode verified. Initializing 3D engine...';
-      }
-      if (authPassword) authPassword.classList.remove('error');
-      setTimeout(() => {
-        unlockApp();
-      }, 350);
-    } else {
-      if (authStatusMsg) {
-        authStatusMsg.className = 'auth-status-msg error';
-        authStatusMsg.textContent = '✕ Incorrect passcode. Access restricted.';
-      }
-      if (authPassword) {
-        authPassword.classList.add('error');
-        authPassword.focus();
-        authPassword.select();
-      }
-      if (authCard) {
-        authCard.classList.remove('shake');
-        void authCard.offsetWidth;
-        authCard.classList.add('shake');
-      }
-    }
-  }
-
-  if (authForm) {
-    authForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      handlePasscodeSubmit();
-    });
-  }
-
-  if (btnAuthUnlock) {
-    btnAuthUnlock.addEventListener('click', (e) => {
-      e.preventDefault();
-      handlePasscodeSubmit();
-    });
-  }
-
-  if (btnTogglePwd && authPassword) {
-    btnTogglePwd.addEventListener('click', () => {
-      if (authPassword.type === 'password') {
-        authPassword.type = 'text';
-        btnTogglePwd.textContent = '🔒';
-      } else {
-        authPassword.type = 'password';
-        btnTogglePwd.textContent = '👁️';
       }
     });
   }
@@ -1434,9 +1363,26 @@ function initAuthGate() {
     unlockApp();
   } else {
     authOverlay.classList.remove('unlocked');
-    setTimeout(() => {
-      if (authPassword) authPassword.focus();
-    }, 100);
+    // Check if Firebase already has an active Google session
+    getFirebaseAuthService().then(({ auth, onAuthStateChanged, signOut }) => {
+      onAuthStateChanged(auth, async (user) => {
+        if (user && user.email && user.email.toLowerCase().endsWith('@google.com')) {
+          const userData = {
+            displayName: user.displayName || user.email.split('@')[0],
+            email: user.email.toLowerCase(),
+            photoURL: user.photoURL || ''
+          };
+          sessionStorage.setItem('google_badge_auth', 'granted');
+          sessionStorage.setItem('google_badge_user', JSON.stringify(userData));
+          renderUserProfile(userData);
+          unlockApp();
+        } else if (user) {
+          await signOut(auth);
+        }
+      });
+    }).catch(err => {
+      console.warn("Firebase Auth listener error:", err);
+    });
   }
 }
 
