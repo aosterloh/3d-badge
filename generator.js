@@ -27,11 +27,11 @@ const BADGE_SPECS = {
   pocketHeight: 85.8,
   pocketDepth: 1.30,
 
-  // Frame covers 2.2 mm on rails, with 21.6 mm diameter lower-right medallion disc covering badge corner
+  // Frame covers 2.2 mm on rails, with 19.0 mm diameter bed-anchored lower-right medallion disc
   bezelCoverage: 2.2,
   cornerDiscRadius: 7.5,
-  medallionDiameter: 21.6, // 20% larger than 18.0 mm
-  medallionRadius: 10.8,  // 21.6 mm diameter disc centered over lower-right corner
+  medallionDiameter: 19.0, // 19.0 mm diameter disc
+  medallionRadius: 9.5,   // 9.5 mm radius disc centered outside card pocket
   medallionOffsetX: 0.0,
   medallionOffsetY: 0.0,
 
@@ -1453,50 +1453,37 @@ function createBadgeHolderAssembly(options = {}) {
   meshChamferB.name = "ChamferRampBottom";
   holderGroup.add(meshChamferB);
 
-  // 4. Lower-Right Corner Medallion Disc
-  // Full 360-degree circle on front face covering lower-right badge corner
-  // Solid bed-anchored base outside card pocket (Z = 0 to frontZ)
-  // Card tunnel clearance inside pocket (Z = backplateThickness to frontZ)
-  const cx = px - 2.0 + medallionOffsetX;
-  const cy = py + 2.0 + medallionOffsetY;
+  // 4. Single Bed-Anchored Lower-Right Corner Medallion Disc
+  // Centered outside the card pocket at (cx, cy) so the logo sits 100% on the solid flat top.
+  // Extruded continuously from the print bed (Z=0) to the top face (Z=baseThickness).
+  // Strictly exterior to the card pocket (x >= px || y <= py) - ZERO mid-air overhang into card tunnel!
+  const outwardOffset = 5.4;
+  const cx = px + outwardOffset + medallionOffsetX;
+  const cy = py - outwardOffset + medallionOffsetY;
   const r = medallionRadius;
 
-  // 4a. Front Full 360-degree Circular Medallion Disc (Z = frontZ to baseThickness)
-  const frontDiscShape = new THREE.Shape();
-  frontDiscShape.absarc(cx, cy, r, 0, Math.PI * 2, false);
-  const frontDiscGeom = new THREE.ExtrudeGeometry(frontDiscShape, {
-    depth: frontLipThickness,
-    bevelEnabled: false,
-    curveSegments: 36
-  });
-  const frontDiscMesh = new THREE.Mesh(frontDiscGeom, bodyMaterial);
-  frontDiscMesh.position.z = frontZ;
-  frontDiscMesh.name = "CornerDisc_Front";
-  holderGroup.add(frontDiscMesh);
-
-  // 4b. Solid Bed-Anchored Base outside card pocket (X >= px or Y <= py)
   const dy = Math.sqrt(Math.max(0, r * r - (px - cx) * (px - cx)));
   const y1 = cy + dy;
   const dx = Math.sqrt(Math.max(0, r * r - (py - cy) * (py - cy)));
   const x2 = cx - dx;
 
-  const baseAnchorShape = new THREE.Shape();
+  const medallionShape = new THREE.Shape();
   const startAngle = Math.atan2(y1 - cy, px - cx);
   const endAngle = Math.atan2(py - cy, x2 - cx);
-  baseAnchorShape.moveTo(px, y1);
-  baseAnchorShape.absarc(cx, cy, r, startAngle, endAngle, true);
-  baseAnchorShape.lineTo(px, py);
-  baseAnchorShape.lineTo(px, y1);
-  baseAnchorShape.closePath();
+  medallionShape.moveTo(px, y1);
+  medallionShape.absarc(cx, cy, r, startAngle, endAngle, true);
+  medallionShape.lineTo(px, py);
+  medallionShape.lineTo(px, y1);
+  medallionShape.closePath();
 
-  const baseAnchorGeom = new THREE.ExtrudeGeometry(baseAnchorShape, {
-    depth: frontZ,
+  const medallionGeom = new THREE.ExtrudeGeometry(medallionShape, {
+    depth: specs.baseThickness,
     bevelEnabled: false,
     curveSegments: 36
   });
-  const baseAnchorMesh = new THREE.Mesh(baseAnchorGeom, bodyMaterial);
-  baseAnchorMesh.name = "CornerDisc_Base";
-  holderGroup.add(baseAnchorMesh);
+  const medallionMesh = new THREE.Mesh(medallionGeom, bodyMaterial);
+  medallionMesh.name = "CornerDisc_0";
+  holderGroup.add(medallionMesh);
 
   // 5. Single Lower-Right Corner Logo (Embossed on the front circular disc)
   const chosenService = (corners && corners['bottom-right'] && corners['bottom-right'] !== 'none')
