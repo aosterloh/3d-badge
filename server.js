@@ -27,10 +27,11 @@ const server = http.createServer((req, res) => {
     reqPath = '/index.html';
   }
 
-  const filePath = path.join(__dirname, reqPath);
+  const rootDir = path.resolve(__dirname);
+  const filePath = path.resolve(rootDir, '.' + reqPath);
 
   // Security: prevent directory traversal
-  if (!filePath.startsWith(__dirname)) {
+  if (!filePath.startsWith(rootDir)) {
     res.writeHead(403);
     res.end('Forbidden');
     return;

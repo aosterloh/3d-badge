@@ -1089,17 +1089,32 @@ function getDirectServiceShapes(serviceName) {
       shapes.push(bar);
     }
   } else if (name.includes('dino') || name.includes('trex') || name.includes('t-rex')) {
-    // Chrome Offline Lonely T-Rex (Pixel-accurate silhouette & eye cutout)
+    // Chrome Offline Lonely T-Rex (100% authentic 8-bit Chromium sprite silhouette & eye cutout)
     const dino = new THREE.Shape();
-    dino.moveTo(-1.5, -4.5); dino.lineTo(-0.5, -4.5); dino.lineTo(-0.5, -2.5); dino.lineTo(0.5, -2.5);
-    dino.lineTo(0.5, -4.5); dino.lineTo(1.5, -4.5); dino.lineTo(1.5, -1.5); dino.lineTo(2.5, -1.5);
-    dino.lineTo(2.5, -0.5); dino.lineTo(1.5, -0.5); dino.lineTo(1.5, 1.5); dino.lineTo(4.5, 1.5);
-    dino.lineTo(4.5, 4.5); dino.lineTo(0.5, 4.5); dino.lineTo(0.5, 3.0); dino.lineTo(-1.5, 3.0);
-    dino.lineTo(-2.5, 2.0); dino.lineTo(-3.5, 0.5); dino.lineTo(-4.8, -0.5); dino.lineTo(-3.5, -1.2);
-    dino.lineTo(-2.0, -1.2); dino.lineTo(-1.5, -2.5); dino.closePath();
+    const pts = [
+      [-2.2, -5.0], [-2.2, -3.0], [-2.6, -3.0], [-2.6, -2.6], [-3.4, -2.6], [-3.4, -2.2], [-3.8, -2.2], [-3.8, -1.8],
+      [-4.2, -1.8], [-4.2, -1.4], [-4.6, -1.4], [-4.6,  1.8], [-4.2,  1.8], [-4.2,  0.6], [-3.8,  0.6], [-3.8,  0.2],
+      [-3.4,  0.2], [-3.4, -0.2], [-2.2, -0.2], [-2.2,  0.2], [-1.8,  0.2], [-1.8,  0.6], [-1.4,  0.6], [-1.4,  1.0],
+      [-0.6,  1.0], [-0.6,  1.4], [-0.2,  1.4], [-0.2,  4.2], [ 0.2,  4.2], [ 0.2,  5.0], [ 4.2,  5.0], [ 4.2,  4.6],
+      [ 4.6,  4.6], [ 4.6,  2.6], [ 2.2,  2.6], [ 2.2,  2.2], [ 3.8,  2.2], [ 3.8,  1.8], [ 2.2,  1.8], [ 2.2,  1.4],
+      [ 1.8,  1.4], [ 1.8,  0.6], [ 2.6,  0.6], [ 2.6, -0.2], [ 2.2, -0.2], [ 2.2,  0.2], [ 1.8,  0.2], [ 1.8, -1.4],
+      [ 1.4, -1.4], [ 1.4, -2.2], [ 1.0, -2.2], [ 1.0, -2.6], [ 0.6, -2.6], [ 0.6, -4.6], [ 1.0, -4.6], [ 1.0, -5.0],
+      [-0.2, -5.0], [-0.2, -3.4], [-0.6, -3.4], [-0.6, -3.0], [-1.0, -3.0], [-1.0, -3.4], [-1.4, -3.4], [-1.4, -4.2],
+      [-1.8, -4.2], [-1.8, -4.6], [-1.4, -4.6], [-1.4, -5.0]
+    ];
+    dino.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) {
+      dino.lineTo(pts[i][0], pts[i][1]);
+    }
+    dino.closePath();
 
+    // Rectangular eye cutout
     const eye = new THREE.Path();
-    eye.moveTo(2.0, 3.2); eye.lineTo(2.8, 3.2); eye.lineTo(2.8, 4.0); eye.lineTo(2.0, 4.0); eye.closePath();
+    eye.moveTo(1.0, 3.8);
+    eye.lineTo(1.4, 3.8);
+    eye.lineTo(1.4, 4.6);
+    eye.lineTo(1.0, 4.6);
+    eye.closePath();
     dino.holes.push(eye);
 
     shapes.push(dino);
