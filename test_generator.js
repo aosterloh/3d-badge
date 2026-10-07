@@ -147,9 +147,10 @@ const { generate3MFPackage } = require('./generator.js');
   }
   console.log("✓ Bambu Studio process settings verified (4 walls, 0.16mm layer height, Arachne, Tree Slim supports)");
 
-  // 8. Test All 27 Logos (Google + 22 Pop Culture & Geek Icons)
+  // 8. Test All 33 Logos (Google + Electronic Music + Pop Culture & Geek Icons)
   const allLogos = [
-    'cloud', 'android', 'chrome', 'youtube', 'deepmind',
+    'cloud', 'android', 'chrome', 'youtube', 'deepmind', 'dino',
+    'synth', 'notes', 'headphones', 'equalizer', 'turntable',
     'vader', 'yoda', 'mando', 'rebel', 'empire', 'starfleet', 'deathstar',
     'batman', 'superman', 'spiderman', 'punisher', 'deadpool',
     'invader', 'pacman', 'triforce', 'pokeball', 'mushroom', 'aperture', 'halflife',
@@ -176,7 +177,7 @@ const { generate3MFPackage } = require('./generator.js');
   // 9. Strict Topology Assertion: Guarantee 0 Non-Manifold Edges and 0 Open Edges in 3MF
   console.log("\nVerifying 3MF topology (asserting 0 non-manifold edges and 0 open edges)...");
   for (const style of ['plain', 'wave']) {
-    for (const logoId of ['cloud', 'vader', 'invader', 'pokeball', 'aperture', 'halflife', 'nasa', 'deathstar']) {
+    for (const logoId of ['cloud', 'dino', 'synth', 'notes', 'headphones', 'turntable', 'equalizer', 'vader', 'invader', 'pokeball']) {
       const assembly = createBadgeHolderAssembly({
         frameStyle: style,
         colorHex: '#202124',

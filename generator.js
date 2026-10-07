@@ -987,6 +987,122 @@ function getDirectServiceShapes(serviceName) {
     chevron.lineTo(-3.2, -3.2);
     chevron.closePath();
     shapes.push(chevron);
+
+  // ==========================================
+  // 6. ELECTRONIC MUSIC, SYNTHS & CHROME DINO
+  // ==========================================
+  } else if (name.includes('synth') || name.includes('keyboard')) {
+    // Synthesizer Keyboard (Chassis with white & black key relief)
+    const sFrame = new THREE.Shape();
+    const fw = 10.4, fh = 7.4, fr = 1.0;
+    sFrame.moveTo(-fw/2 + fr, -fh/2);
+    sFrame.lineTo(fw/2 - fr, -fh/2);
+    sFrame.quadraticCurveTo(fw/2, -fh/2, fw/2, -fh/2 + fr);
+    sFrame.lineTo(fw/2, fh/2 - fr);
+    sFrame.quadraticCurveTo(fw/2, fh/2, fw/2 - fr, fh/2);
+    sFrame.lineTo(-fw/2 + fr, fh/2);
+    sFrame.quadraticCurveTo(-fw/2, fh/2, -fw/2, fh/2 - fr);
+    sFrame.lineTo(-fw/2, -fh/2 + fr);
+    sFrame.quadraticCurveTo(-fw/2, -fh/2, -fw/2 + fr, -fh/2);
+    sFrame.closePath();
+
+    const sHole = new THREE.Path();
+    sHole.moveTo(-4.6, -3.1);
+    sHole.lineTo(4.6, -3.1);
+    sHole.lineTo(4.6, 3.1);
+    sHole.lineTo(-4.6, 3.1);
+    sHole.closePath();
+    sFrame.holes.push(sHole);
+    shapes.push(sFrame);
+
+    for (let i = 0; i < 5; i++) {
+      const wk = new THREE.Shape();
+      const x = -4.3 + i * 1.75;
+      wk.moveTo(x, -2.8);
+      wk.lineTo(x + 1.55, -2.8);
+      wk.lineTo(x + 1.55, 2.8);
+      wk.lineTo(x, 2.8);
+      wk.closePath();
+      shapes.push(wk);
+    }
+  } else if (name.includes('note')) {
+    // Electronic Music Notes (♫ Bold Beamed Eighth Notes)
+    const nL = new THREE.Shape();
+    nL.absellipse(-2.5, -2.5, 1.8, 1.3, 0.4, 0, Math.PI * 2, false);
+    const nR = new THREE.Shape();
+    nR.absellipse(2.5, -1.5, 1.8, 1.3, 0.4, 0, Math.PI * 2, false);
+
+    const sL = new THREE.Shape();
+    sL.moveTo(-1.2, -2.2); sL.lineTo(-1.2, 3.8); sL.lineTo(-0.4, 3.8); sL.lineTo(-0.4, -1.8); sL.closePath();
+
+    const sR = new THREE.Shape();
+    sR.moveTo(3.8, -1.2); sR.lineTo(3.8, 4.8); sR.lineTo(4.6, 4.8); sR.lineTo(4.6, -0.8); sR.closePath();
+
+    const bm = new THREE.Shape();
+    bm.moveTo(-1.2, 3.0); bm.lineTo(4.6, 4.0); bm.lineTo(4.6, 5.0); bm.lineTo(-1.2, 4.0); bm.closePath();
+
+    shapes.push(nL, nR, sL, sR, bm);
+  } else if (name.includes('headphone')) {
+    // DJ / Studio Headphones (Headband + Dual Ear Cups)
+    const hpBand = new THREE.Shape();
+    hpBand.absarc(0, 0.5, 4.6, 0.1, Math.PI - 0.1, false);
+    hpBand.absarc(0, 0.5, 3.6, Math.PI - 0.1, 0.1, true);
+    hpBand.closePath();
+
+    const cupL = new THREE.Shape();
+    cupL.absellipse(-4.2, -1.2, 1.2, 2.2, 0, 0, Math.PI * 2, false);
+
+    const cupR = new THREE.Shape();
+    cupR.absellipse(4.2, -1.2, 1.2, 2.2, 0, 0, Math.PI * 2, false);
+
+    shapes.push(hpBand, cupL, cupR);
+  } else if (name.includes('turntable') || name.includes('vinyl')) {
+    // DJ Turntable Vinyl Record & Tonearm
+    const vinyl = new THREE.Shape();
+    vinyl.absarc(0, 0, 5.0, 0, Math.PI * 2, false);
+    const vHole = new THREE.Path();
+    vHole.absarc(0, 0, 1.8, 0, Math.PI * 2, true);
+    vinyl.holes.push(vHole);
+
+    const centerLabel = new THREE.Shape();
+    centerLabel.absarc(0, 0, 1.3, 0, Math.PI * 2, false);
+    const spindleHole = new THREE.Path();
+    spindleHole.absarc(0, 0, 0.4, 0, Math.PI * 2, true);
+    centerLabel.holes.push(spindleHole);
+
+    const arm = new THREE.Shape();
+    arm.moveTo(3.6, 3.6); arm.lineTo(4.4, 3.6); arm.lineTo(2.2, -1.4); arm.lineTo(1.6, -1.1); arm.closePath();
+
+    shapes.push(vinyl, centerLabel, arm);
+  } else if (name.includes('equalizer') || name.includes('eq')) {
+    // Graphic Audio Spectrum Equalizer (5 VU Bars)
+    const hList = [2.4, 4.2, 6.2, 5.0, 3.2];
+    for (let i = 0; i < 5; i++) {
+      const bar = new THREE.Shape();
+      const bx = -4.0 + i * 2.0;
+      const bh = hList[i];
+      bar.moveTo(bx - 0.6, -3.5);
+      bar.lineTo(bx + 0.6, -3.5);
+      bar.lineTo(bx + 0.6, -3.5 + bh);
+      bar.lineTo(bx - 0.6, -3.5 + bh);
+      bar.closePath();
+      shapes.push(bar);
+    }
+  } else if (name.includes('dino') || name.includes('trex') || name.includes('t-rex')) {
+    // Chrome Offline Lonely T-Rex (Pixel-accurate silhouette & eye cutout)
+    const dino = new THREE.Shape();
+    dino.moveTo(-1.5, -4.5); dino.lineTo(-0.5, -4.5); dino.lineTo(-0.5, -2.5); dino.lineTo(0.5, -2.5);
+    dino.lineTo(0.5, -4.5); dino.lineTo(1.5, -4.5); dino.lineTo(1.5, -1.5); dino.lineTo(2.5, -1.5);
+    dino.lineTo(2.5, -0.5); dino.lineTo(1.5, -0.5); dino.lineTo(1.5, 1.5); dino.lineTo(4.5, 1.5);
+    dino.lineTo(4.5, 4.5); dino.lineTo(0.5, 4.5); dino.lineTo(0.5, 3.0); dino.lineTo(-1.5, 3.0);
+    dino.lineTo(-2.5, 2.0); dino.lineTo(-3.5, 0.5); dino.lineTo(-4.8, -0.5); dino.lineTo(-3.5, -1.2);
+    dino.lineTo(-2.0, -1.2); dino.lineTo(-1.5, -2.5); dino.closePath();
+
+    const eye = new THREE.Path();
+    eye.moveTo(2.0, 3.2); eye.lineTo(2.8, 3.2); eye.lineTo(2.8, 4.0); eye.lineTo(2.0, 4.0); eye.closePath();
+    dino.holes.push(eye);
+
+    shapes.push(dino);
   } else {
     // Default fallback to Google Cloud (watertight tangent base)
     const cloud = new THREE.Shape();

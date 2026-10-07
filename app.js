@@ -5,8 +5,9 @@
  */
 
 // Available Emblems Pools
-const GOOGLE_LOGOS = ['cloud', 'android', 'chrome', 'youtube', 'deepmind'];
+const GOOGLE_LOGOS = ['cloud', 'android', 'chrome', 'youtube', 'deepmind', 'dino'];
 const POPCULTURE_LOGOS = [
+  'synth', 'notes', 'headphones', 'equalizer', 'turntable',
   'vader', 'yoda', 'mando', 'rebel', 'empire', 'starfleet', 'deathstar',
   'batman', 'superman', 'spiderman', 'punisher', 'deadpool',
   'invader', 'pacman', 'triforce', 'pokeball', 'mushroom', 'aperture', 'halflife',
