@@ -355,10 +355,40 @@
                 <div class="dimension-slider-row">
                   <div class="slider-labels">
                     <span class="dim-title">Front Rail Overlap</span>
-                    <span class="dim-value" id="valBezelCoverage">3.0 mm</span>
+                    <span class="dim-value" id="valBezelCoverage">2.2 mm</span>
                   </div>
-                  <input type="range" class="dim-slider" id="sliderBezelCoverage" min="1.5" max="5.0" step="0.1" value="3.0">
-                  <span class="dim-hint">Front lip retaining card edges</span>
+                  <input type="range" class="dim-slider" id="sliderBezelCoverage" min="1.5" max="5.0" step="0.1" value="2.2">
+                  <span class="dim-hint">Front lip retaining card edges (45° chamfer ramps)</span>
+                </div>
+
+                <!-- Lower-Right Medallion Circle Diameter -->
+                <div class="dimension-slider-row">
+                  <div class="slider-labels">
+                    <span class="dim-title">Medallion Diameter</span>
+                    <span class="dim-value" id="valMedallionDiameter">21.6 mm</span>
+                  </div>
+                  <input type="range" class="dim-slider" id="sliderMedallionDiameter" min="14.0" max="28.0" step="0.2" value="21.6">
+                  <span class="dim-hint">Full circular corner disc diameter (20% larger default)</span>
+                </div>
+
+                <!-- Medallion X Offset -->
+                <div class="dimension-slider-row">
+                  <div class="slider-labels">
+                    <span class="dim-title">Medallion X Offset</span>
+                    <span class="dim-value" id="valMedallionOffsetX">0.0 mm</span>
+                  </div>
+                  <input type="range" class="dim-slider" id="sliderMedallionOffsetX" min="-6.0" max="6.0" step="0.2" value="0.0">
+                  <span class="dim-hint">Horizontal shift (+ inward over card, - outward)</span>
+                </div>
+
+                <!-- Medallion Y Offset -->
+                <div class="dimension-slider-row">
+                  <div class="slider-labels">
+                    <span class="dim-title">Medallion Y Offset</span>
+                    <span class="dim-value" id="valMedallionOffsetY">0.0 mm</span>
+                  </div>
+                  <input type="range" class="dim-slider" id="sliderMedallionOffsetY" min="-6.0" max="6.0" step="0.2" value="0.0">
+                  <span class="dim-hint">Vertical shift (+ upward over card, - downward)</span>
                 </div>
 
                 <!-- Backplate Thickness -->
@@ -579,7 +609,7 @@
   <script src="libs/SVGLoader.js"></script>
   <script src="libs/jszip.min.js"></script>
   <script src="images/badge_base64.js"></script>
-  <script src="generator.js?v=v15_manifold_swivel"></script>
-  <script src="app.js?v=v15_manifold_swivel"></script>
+  <script src="generator.js?v=v16_full_circle_tunnel"></script>
+  <script src="app.js?v=v16_full_circle_tunnel"></script>
 </body>
 </html>

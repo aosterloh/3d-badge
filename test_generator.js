@@ -72,14 +72,17 @@ assemblyCustomColor.traverse(child => {
 });
 if (foundYellowCount !== 1) throw new Error(`Expected 1 yellow emblem, found ${foundYellowCount}`);
 
-// 4. Test Single Bed-Anchored Corner Medallion Disc Geometry
-let cornerDiscCount = 0;
+// 4. Test Medallion Components (Full Front Disc + Solid Base Anchor) & 45° Chamfer Ramps
+let hasFrontDisc = false;
+let hasBaseDisc = false;
+let chamferCount = 0;
 assemblyCustomColor.traverse(child => {
-  if (child.name && child.name.startsWith('CornerDisc_')) {
-    cornerDiscCount++;
-  }
+  if (child.name === 'CornerDisc_Front') hasFrontDisc = true;
+  if (child.name === 'CornerDisc_Base') hasBaseDisc = true;
+  if (child.name && child.name.startsWith('ChamferRamp')) chamferCount++;
 });
-if (cornerDiscCount !== 1) throw new Error(`Expected 1 corner medallion disc, found ${cornerDiscCount}`);
+if (!hasFrontDisc || !hasBaseDisc) throw new Error("Expected CornerDisc_Front and CornerDisc_Base for full circle & card tunnel clearance!");
+if (chamferCount !== 3) throw new Error(`Expected 3 self-supporting 45° chamfer ramps, found ${chamferCount}`);
 
 const stl = exporter.parse(assemblyCustomColor, { binary: true });
 console.log(`Binary STL with lower-right emblem & medallion disc: ${(stl.byteLength / 1024).toFixed(1)} KB`);

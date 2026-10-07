@@ -27,10 +27,13 @@ const BADGE_SPECS = {
   pocketHeight: 85.8,
   pocketDepth: 1.30,
 
-  // Frame covers 3.0 mm on rails, with 18.0 mm diameter bed-anchored lower-right medallion disc
-  bezelCoverage: 3.0,
+  // Frame covers 2.2 mm on rails, with 21.6 mm diameter lower-right medallion disc covering badge corner
+  bezelCoverage: 2.2,
   cornerDiscRadius: 7.5,
-  medallionRadius: 9.0,  // 18 mm diameter solid disc centered over lower-right corner
+  medallionDiameter: 21.6, // 20% larger than 18.0 mm
+  medallionRadius: 10.8,  // 21.6 mm diameter disc centered over lower-right corner
+  medallionOffsetX: 0.0,
+  medallionOffsetY: 0.0,
 
   // Ultra-minimal outer envelope
   baseWidth: 56.8,       // 54.4 pocket + 2 x 1.2mm side walls
@@ -1021,7 +1024,13 @@ function createEmblemMesh(serviceName, isEmbossed, corner, customSvgShapes, body
   geom.computeBoundingBox();
   geom.center();
 
-  // Position at the 15 mm circular disc center (top discs shifted down 3mm for top slide-in clearance)
+  // Scale emblem proportionally with medallion diameter (20% larger default: 21.6mm / 18.0mm = 1.20)
+  const emblemScale = (specs.medallionDiameter ? (specs.medallionDiameter / 18.0) : 1.20);
+  if (Math.abs(emblemScale - 1.0) > 0.001) {
+    geom.scale(emblemScale, emblemScale, 1.0);
+  }
+
+  // Position at the circular disc center
   const topDrop = 3.0;
   const cornerX = specs.baseWidth / 2 - specs.cornerDiscRadius;
   const cornerY = specs.baseHeight / 2 - specs.cornerDiscRadius;
@@ -1043,8 +1052,8 @@ function createEmblemMesh(serviceName, isEmbossed, corner, customSvgShapes, body
       break;
     case 'bottom-right':
     default:
-      posX = specs.baseWidth / 2;
-      posY = -specs.baseHeight / 2;
+      posX = (specs.medallionCenterX !== undefined) ? specs.medallionCenterX : (specs.baseWidth / 2);
+      posY = (specs.medallionCenterY !== undefined) ? specs.medallionCenterY : (-specs.baseHeight / 2);
       break;
   }
 
@@ -1094,6 +1103,10 @@ function createBadgeHolderAssembly(options = {}) {
   const backplateThickness = Number(custom.backplateThickness ?? BADGE_SPECS.backplateThickness);
   const frontLipThickness = Number(custom.frontLipThickness ?? BADGE_SPECS.frontLipThickness);
   const bezelCoverage = Number(custom.bezelCoverage ?? BADGE_SPECS.bezelCoverage);
+  const medallionDiameter = Number(custom.medallionDiameter ?? BADGE_SPECS.medallionDiameter ?? 21.6);
+  const medallionRadius = medallionDiameter / 2;
+  const medallionOffsetX = Number(custom.medallionOffsetX ?? BADGE_SPECS.medallionOffsetX ?? 0.0);
+  const medallionOffsetY = Number(custom.medallionOffsetY ?? BADGE_SPECS.medallionOffsetY ?? 0.0);
   const slotWidth = Number(custom.slotWidth ?? BADGE_SPECS.slotWidth);
   const slotHeight = Number(custom.slotHeight ?? BADGE_SPECS.slotHeight);
   const thumbWidth = Number(custom.thumbWidth ?? BADGE_SPECS.thumbWidth);
@@ -1114,6 +1127,10 @@ function createBadgeHolderAssembly(options = {}) {
     backplateThickness,
     frontLipThickness,
     bezelCoverage,
+    medallionDiameter,
+    medallionRadius,
+    medallionOffsetX,
+    medallionOffsetY,
     slotWidth,
     slotHeight,
     thumbWidth,
@@ -1258,17 +1275,99 @@ function createBadgeHolderAssembly(options = {}) {
   frontBottomMesh.name = "FrontBottomLip";
   holderGroup.add(frontBottomMesh);
 
-  // 4. Single Bed-Anchored Lower-Right Corner Medallion Disc
-  // Centered directly over the frame corner (cx, cy) and printed continuously on all layers from bed (Z=0) to top (Z=baseThickness)
-  // Flush with the front face, zero hovering, zero cantilevers!
-  const medallionShape = createMedallionShape(specs);
-  const medallionExtrude = { depth: specs.baseThickness, bevelEnabled: false, steps: 1 };
-  const medallionGeom = new THREE.ExtrudeGeometry(medallionShape, medallionExtrude);
-  const medallionMesh = new THREE.Mesh(medallionGeom, bodyMaterial);
-  medallionMesh.name = "CornerDisc_0"; // Grouped into Badge_Holder_Frame in 3MF
-  holderGroup.add(medallionMesh);
+  // 3b. Self-Supporting 45-degree Chamfer Fillets along rail & lip undersides
+  // Eliminates unsupported mid-air overhangs for 100% clean prints without supports
+  const rampH = 0.45;
+  const rampZ = frontZ - rampH;
+  const px = specs.pocketWidth / 2;
+  const py = -specs.pocketHeight / 2;
 
-  // 5. Single Lower-Right Corner Logo (Embossed on the bed-anchored medallion)
+  // Left Rail Chamfer Fillet (slopes 45 deg from vertical wall inward to front lip)
+  const sChamferL = new THREE.Shape();
+  sChamferL.moveTo(0, 0);
+  sChamferL.lineTo(0, rampH);
+  sChamferL.lineTo(rampH, rampH);
+  sChamferL.closePath();
+  const geoChamferL = new THREE.ExtrudeGeometry(sChamferL, { depth: pocketHeight, bevelEnabled: false });
+  geoChamferL.rotateX(Math.PI / 2);
+  const meshChamferL = new THREE.Mesh(geoChamferL, bodyMaterial);
+  meshChamferL.position.set(-px, pocketHeight / 2, rampZ);
+  meshChamferL.name = "ChamferRampLeft";
+  holderGroup.add(meshChamferL);
+
+  // Right Rail Chamfer Fillet
+  const sChamferR = new THREE.Shape();
+  sChamferR.moveTo(0, 0);
+  sChamferR.lineTo(0, rampH);
+  sChamferR.lineTo(-rampH, rampH);
+  sChamferR.closePath();
+  const geoChamferR = new THREE.ExtrudeGeometry(sChamferR, { depth: pocketHeight, bevelEnabled: false });
+  geoChamferR.rotateX(Math.PI / 2);
+  const meshChamferR = new THREE.Mesh(geoChamferR, bodyMaterial);
+  meshChamferR.position.set(px, pocketHeight / 2, rampZ);
+  meshChamferR.name = "ChamferRampRight";
+  holderGroup.add(meshChamferR);
+
+  // Bottom Lip Chamfer Fillet
+  const sChamferB = new THREE.Shape();
+  sChamferB.moveTo(0, 0);
+  sChamferB.lineTo(0, rampH);
+  sChamferB.lineTo(rampH, rampH);
+  sChamferB.closePath();
+  const geoChamferB = new THREE.ExtrudeGeometry(sChamferB, { depth: pocketWidth, bevelEnabled: false });
+  geoChamferB.rotateZ(Math.PI / 2);
+  geoChamferB.rotateY(Math.PI / 2);
+  const meshChamferB = new THREE.Mesh(geoChamferB, bodyMaterial);
+  meshChamferB.position.set(-px, py, rampZ);
+  meshChamferB.name = "ChamferRampBottom";
+  holderGroup.add(meshChamferB);
+
+  // 4. Lower-Right Corner Medallion Disc
+  // Full 360-degree circle on front face covering lower-right badge corner
+  // Solid bed-anchored base outside card pocket (Z = 0 to frontZ)
+  // Card tunnel clearance inside pocket (Z = backplateThickness to frontZ)
+  const cx = px - 2.0 + medallionOffsetX;
+  const cy = py + 2.0 + medallionOffsetY;
+  const r = medallionRadius;
+
+  // 4a. Front Full 360-degree Circular Medallion Disc (Z = frontZ to baseThickness)
+  const frontDiscShape = new THREE.Shape();
+  frontDiscShape.absarc(cx, cy, r, 0, Math.PI * 2, false);
+  const frontDiscGeom = new THREE.ExtrudeGeometry(frontDiscShape, {
+    depth: frontLipThickness,
+    bevelEnabled: false,
+    curveSegments: 36
+  });
+  const frontDiscMesh = new THREE.Mesh(frontDiscGeom, bodyMaterial);
+  frontDiscMesh.position.z = frontZ;
+  frontDiscMesh.name = "CornerDisc_Front";
+  holderGroup.add(frontDiscMesh);
+
+  // 4b. Solid Bed-Anchored Base outside card pocket (X >= px or Y <= py)
+  const dy = Math.sqrt(Math.max(0, r * r - (px - cx) * (px - cx)));
+  const y1 = cy + dy;
+  const dx = Math.sqrt(Math.max(0, r * r - (py - cy) * (py - cy)));
+  const x2 = cx - dx;
+
+  const baseAnchorShape = new THREE.Shape();
+  const startAngle = Math.atan2(y1 - cy, px - cx);
+  const endAngle = Math.atan2(py - cy, x2 - cx);
+  baseAnchorShape.moveTo(px, y1);
+  baseAnchorShape.absarc(cx, cy, r, startAngle, endAngle, true);
+  baseAnchorShape.lineTo(px, py);
+  baseAnchorShape.lineTo(px, y1);
+  baseAnchorShape.closePath();
+
+  const baseAnchorGeom = new THREE.ExtrudeGeometry(baseAnchorShape, {
+    depth: frontZ,
+    bevelEnabled: false,
+    curveSegments: 36
+  });
+  const baseAnchorMesh = new THREE.Mesh(baseAnchorGeom, bodyMaterial);
+  baseAnchorMesh.name = "CornerDisc_Base";
+  holderGroup.add(baseAnchorMesh);
+
+  // 5. Single Lower-Right Corner Logo (Embossed on the front circular disc)
   const chosenService = (corners && corners['bottom-right'] && corners['bottom-right'] !== 'none')
     ? corners['bottom-right']
     : ((corners && corners['top-left'] && corners['top-left'] !== 'none')
@@ -1276,7 +1375,15 @@ function createBadgeHolderAssembly(options = {}) {
       : (service && service !== 'none' ? service : 'cloud'));
 
   if (chosenService && chosenService !== 'none') {
-    const emblemMesh = createEmblemMesh(chosenService, isEmbossed, 'bottom-right', customShapes, bodyMaterial, logoMaterial, specs);
+    const emblemMesh = createEmblemMesh(
+      chosenService,
+      isEmbossed,
+      'bottom-right',
+      customShapes,
+      bodyMaterial,
+      logoMaterial,
+      { ...specs, medallionCenterX: cx, medallionCenterY: cy, medallionRadius: r, medallionDiameter }
+    );
     if (emblemMesh) {
       holderGroup.add(emblemMesh);
     }
