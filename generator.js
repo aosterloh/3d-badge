@@ -1582,6 +1582,24 @@ async function generate3MFPackage(THREE, JSZip, assembly, options = {}) {
   zip.folder('3D').file('3dmodel.model', modelXml);
 
   if (isBambu) {
+    const processSettingsObj = {
+      version: '1.0.0',
+      process: {
+        wall_loops: '4',
+        sparse_infill_density: '25%',
+        sparse_infill_pattern: 'gyroid',
+        top_shell_layers: '5',
+        bottom_shell_layers: '4',
+        layer_height: '0.16',
+        line_width_type: 'arachne',
+        enable_support: '1',
+        support_type: 'tree_slim',
+        support_top_z_distance: '0.20',
+        support_object_xy_distance: '0.50'
+      }
+    };
+    const processSettingsJson = JSON.stringify(processSettingsObj, null, 2);
+
     const modelSettingsXml =
       '<?xml version="1.0" encoding="UTF-8"?>\n' +
       '<config>\n' +
@@ -1616,6 +1634,8 @@ async function generate3MFPackage(THREE, JSZip, assembly, options = {}) {
 
     zip.folder('Metadata').file('model_settings.config', modelSettingsXml);
     zip.folder('Metadata').file('slice_info.config', sliceInfoXml);
+    zip.folder('Metadata').file('project_settings.config', processSettingsJson);
+    zip.folder('Metadata').file('process_settings.config', processSettingsJson);
   }
 
   return await zip.generateAsync({

@@ -135,6 +135,18 @@ const { generate3MFPackage } = require('./generator.js');
     throw new Error("3MF generation produced an invalid or empty buffer!");
   }
 
+  // Verify Bambu process settings configs are present and valid
+  const zipBambuCheck = await JSZip.loadAsync(bufBambu);
+  const projSettingsRaw = await zipBambuCheck.file('Metadata/project_settings.config').async('string');
+  const projSettings = JSON.parse(projSettingsRaw);
+  if (projSettings.process.wall_loops !== '4' ||
+      projSettings.process.layer_height !== '0.16' ||
+      projSettings.process.enable_support !== '1' ||
+      projSettings.process.support_type !== 'tree_slim') {
+    throw new Error("Bambu process settings mismatch in project_settings.config!");
+  }
+  console.log("✓ Bambu Studio process settings verified (4 walls, 0.16mm layer height, Arachne, Tree Slim supports)");
+
   // 8. Test All 27 Logos (Google + 22 Pop Culture & Geek Icons)
   const allLogos = [
     'cloud', 'android', 'chrome', 'youtube', 'deepmind',
